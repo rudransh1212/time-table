@@ -50,11 +50,24 @@
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
         }
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+        .slide {
+            display: none;
+            width: 100%;
+        }
+        img {
+            width: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Timetable Lookup</h2>
+        <h2>SLEEP SCHEDULE</h2>
         <label for="day">Select Day:</label>
         <select id="day" onchange="updateTimeOptions()">
             <option value="">--Choose Day--</option>
@@ -75,91 +88,117 @@
         <button onclick="showTimetable()">Show Full Timetable</button>
         <h3 id="result"></h3>
         <div id="fullTimetable" class="timetable hidden"></div>
+        
+        <div class="slideshow-container">
+            <img class="slide" src="processed_0.png" alt="Slide 1">
+            <img class="slide" src="processed_1.png" alt="Slide 2">
+            <img class="slide" src="processed_2.png" alt="Slide 3">
+            <img class="slide" src="processed_3.png" alt="Slide 4">
+            <img class="slide" src="processed_4.png" alt="Slide 5">
+        </div>
     </div>
 
     <script>
+        // Timetable Data
         const timetable = {
             "Monday": {
-                "10:00": { subject: "Digital Science", room: "CR54" },
-                "11:00": { subject: "Psychology", room: "230" },
-                "12:00": { subject: "Algorithm", room: "226" },
-                "15:00": { subject: "Digital Lab", room: "134" }
+                "10:00 AM": "Digital Science - Room CR54",
+                "11:00 AM": "Psychology - Room 230",
+                "12:00 PM": "Algorithm - Room 226",
+                "3:00 PM": "Digital Lab - Room 134 (until 5:00 PM)"
             },
             "Tuesday": {
-                "09:00": { subject: "Algorithm", room: "111" },
-                "12:00": { subject: "Digital Tut", room: "138" },
-                "14:00": { subject: "Algorithm Lab", room: "CL2" }
+                "9:00 AM": "Algorithm - Room 111",
+                "12:00 PM": "Digital Tut - Room 138",
+                "2:00 PM": "Algorithm Lab - Room CL2 (until 3:50 PM)"
             },
             "Wednesday": {
-                "09:00": { subject: "PRP Tut", room: "121" },
-                "10:00": { subject: "PRP", room: "CR54" },
-                "11:00": { subject: "Psychology", room: "122" },
-                "12:00": { subject: "EVS", room: "217" },
-                "14:00": { subject: "Psychology", room: "230" },
-                "15:00": { subject: "UHV Tut", room: "116" }
+                "9:00 AM": "PRP Tut - Room 121",
+                "10:00 AM": "PRP - Room CR54",
+                "11:00 AM": "Psychology - Room 122",
+                "12:00 PM": "EVS - Room 217",
+                "2:00 PM": "Psychology - Room 230",
+                "3:00 PM": "UHV Tut - Room 116"
             },
             "Thursday": {
-                "10:00": { subject: "UHV", room: "111" },
-                "11:00": { subject: "Algorithm", room: "CR53" },
-                "12:00": { subject: "Digital", room: "CR53" },
-                "15:00": { subject: "PRP", room: "217" }
+                "10:00 AM": "UHV - Room 111",
+                "11:00 AM": "Algorithm - Room CR53",
+                "12:00 PM": "Digital - Room CR53",
+                "3:00 PM": "PRP - Room 217"
             },
             "Friday": {
-                "10:00": { subject: "EVS", room: "230" },
-                "15:00": { subject: "Digital", room: "CR53" }
+                "10:00 AM": "EVS - Room 230",
+                "3:00 PM": "Digital - Room CR53"
             },
             "Saturday": {
-                "10:00": { subject: "EVS", room: "CR54" },
-                "11:00": { subject: "PRP", room: "148" },
-                "12:00": { subject: "UHV", room: "148" }
+                "10:00 AM": "EVS - Room CR54",
+                "11:00 AM": "PRP - Room 148",
+                "12:00 PM": "UHV - Room 148"
             }
         };
 
+        // Populate time dropdown based on selected day
         function updateTimeOptions() {
             let day = document.getElementById("day").value;
-            let timeSelect = document.getElementById("time");
-            timeSelect.innerHTML = '<option value="">--Choose Time--</option>';
-            
-            if (timetable[day]) {
+            let timeDropdown = document.getElementById("time");
+            timeDropdown.innerHTML = '<option value="">--Choose Time--</option>';
+
+            if (day && timetable[day]) {
                 Object.keys(timetable[day]).forEach(time => {
                     let option = document.createElement("option");
                     option.value = time;
                     option.textContent = time;
-                    timeSelect.appendChild(option);
+                    timeDropdown.appendChild(option);
                 });
             }
         }
 
+        // Look up a class based on selected day & time
         function lookupTimetable() {
             let day = document.getElementById("day").value;
             let time = document.getElementById("time").value;
-            
-            if (timetable[day] && timetable[day][time]) {
-                let classInfo = timetable[day][time];
-                document.getElementById("result").innerText = `Subject: ${classInfo.subject}, Room: ${classInfo.room}`;
+            let result = document.getElementById("result");
+
+            if (day && time && timetable[day] && timetable[day][time]) {
+                result.textContent = `Class: ${timetable[day][time]}`;
             } else {
-                document.getElementById("result").innerText = "No class found at this time.";
+                result.textContent = "No class found.";
             }
         }
 
+        // Display full timetable
         function showTimetable() {
             let fullTimetable = document.getElementById("fullTimetable");
-            fullTimetable.innerHTML = "";
-            
-            for (let day in timetable) {
+            fullTimetable.innerHTML = ""; // Clear previous content
+
+            Object.keys(timetable).forEach(day => {
                 let dayHeader = document.createElement("h4");
-                dayHeader.innerText = day;
+                dayHeader.textContent = day;
                 fullTimetable.appendChild(dayHeader);
-                
-                for (let time in timetable[day]) {
-                    let classInfo = timetable[day][time];
-                    let classDetail = document.createElement("p");
-                    classDetail.innerText = `${time} - ${classInfo.subject}, Room: ${classInfo.room}`;
-                    fullTimetable.appendChild(classDetail);
-                }
-            }
-            fullTimetable.classList.toggle("hidden");
+
+                Object.keys(timetable[day]).forEach(time => {
+                    let classItem = document.createElement("p");
+                    classItem.textContent = `${time} - ${timetable[day][time]}`;
+                    fullTimetable.appendChild(classItem);
+                });
+            });
+
+            fullTimetable.classList.remove("hidden");
         }
+
+        // Slideshow functionality
+        let slideIndex = 0;
+        function showSlides() {
+            let slides = document.getElementsByClassName("slide");
+            for (let slide of slides) {
+                slide.style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) slideIndex = 1;
+            slides[slideIndex - 1].style.display = "block";
+            setTimeout(showSlides, 3000);
+        }
+        showSlides();
     </script>
 </body>
 </html>
