@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+        }
+        select, button {
+            margin: 10px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #444;
+            color: #fff;
+        }
+        button {
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cc3700;
+        }
+        .hidden {
+            display: none;
+        }
+        .timetable {
+            text-align: left;
+            margin-top: 20px;
+            background: #444;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Timetable Lookup</h2>
+        <label for="day">Select Day:</label>
+        <select id="day" onchange="updateTimeOptions()">
+            <option value="">--Choose Day--</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+        </select>
+        <br>
+        <label for="time">Select Time:</label>
+        <select id="time">
+            <option value="">--Choose Time--</option>
+        </select>
+        <br>
+        <button onclick="lookupTimetable()">Find Class</button>
+        <button onclick="showTimetable()">Show Full Timetable</button>
+        <h3 id="result"></h3>
+        <div id="fullTimetable" class="timetable hidden"></div>
+    </div>
+
+    <script>
+        const timetable = {
+            "Monday": {
+                "10:00": { subject: "Digital Science", room: "CR54" },
+                "11:00": { subject: "Psychology", room: "230" },
+                "12:00": { subject: "Algorithm", room: "226" },
+                "15:00": { subject: "Digital Lab", room: "134" }
+            },
+            "Tuesday": {
+                "09:00": { subject: "Algorithm", room: "111" },
+                "12:00": { subject: "Digital Tut", room: "138" },
+                "14:00": { subject: "Algorithm Lab", room: "CL2" }
+            },
+            "Wednesday": {
+                "09:00": { subject: "PRP Tut", room: "121" },
+                "10:00": { subject: "PRP", room: "CR54" },
+                "11:00": { subject: "Psychology", room: "122" },
+                "12:00": { subject: "EVS", room: "217" },
+                "14:00": { subject: "Psychology", room: "230" },
+                "15:00": { subject: "UHV Tut", room: "116" }
+            },
+            "Thursday": {
+                "10:00": { subject: "UHV", room: "111" },
+                "11:00": { subject: "Algorithm", room: "CR53" },
+                "12:00": { subject: "Digital", room: "CR53" },
+                "15:00": { subject: "PRP", room: "217" }
+            },
+            "Friday": {
+                "10:00": { subject: "EVS", room: "230" },
+                "15:00": { subject: "Digital", room: "CR53" }
+            },
+            "Saturday": {
+                "10:00": { subject: "EVS", room: "CR54" },
+                "11:00": { subject: "PRP", room: "148" },
+                "12:00": { subject: "UHV", room: "148" }
+            }
+        };
+
+        function updateTimeOptions() {
+            let day = document.getElementById("day").value;
+            let timeSelect = document.getElementById("time");
+            timeSelect.innerHTML = '<option value="">--Choose Time--</option>';
+            
+            if (timetable[day]) {
+                Object.keys(timetable[day]).forEach(time => {
+                    let option = document.createElement("option");
+                    option.value = time;
+                    option.textContent = time;
+                    timeSelect.appendChild(option);
+                });
+            }
+        }
+
+        function lookupTimetable() {
+            let day = document.getElementById("day").value;
+            let time = document.getElementById("time").value;
+            
+            if (timetable[day] && timetable[day][time]) {
+                let classInfo = timetable[day][time];
+                document.getElementById("result").innerText = `Subject: ${classInfo.subject}, Room: ${classInfo.room}`;
+            } else {
+                document.getElementById("result").innerText = "No class found at this time.";
+            }
+        }
+
+        function showTimetable() {
+            let fullTimetable = document.getElementById("fullTimetable");
+            fullTimetable.innerHTML = "";
+            
+            for (let day in timetable) {
+                let dayHeader = document.createElement("h4");
+                dayHeader.innerText = day;
+                fullTimetable.appendChild(dayHeader);
+                
+                for (let time in timetable[day]) {
+                    let classInfo = timetable[day][time];
+                    let classDetail = document.createElement("p");
+                    classDetail.innerText = `${time} - ${classInfo.subject}, Room: ${classInfo.room}`;
+                    fullTimetable.appendChild(classDetail);
+                }
+            }
+            fullTimetable.classList.toggle("hidden");
+        }
+    </script>
+</body>
+</html>
